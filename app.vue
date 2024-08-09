@@ -4,3 +4,7 @@
     <NuxtWelcome />
   </div>
 </template>
+
+<script setup>
+import 'vuetify/styles'
+</script>
