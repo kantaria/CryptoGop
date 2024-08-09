@@ -8,9 +8,6 @@
       <v-btn icon to="/">
         <v-icon>mdi-home</v-icon>
       </v-btn>
-      <v-btn icon to="/coins">
-        <v-icon>mdi-currency-usd</v-icon>
-      </v-btn>
       <v-btn icon to="/statistics">
         <v-icon>mdi-chart-bar</v-icon>
       </v-btn>

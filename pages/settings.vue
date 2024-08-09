@@ -1,5 +1,6 @@
 <template>
   <v-container>
-    <h1>Настройки</h1>
+    <Coins />
+    <Status />
   </v-container>
 </template>
