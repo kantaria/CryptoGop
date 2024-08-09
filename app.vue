@@ -1,10 +1,6 @@
 <template>
   <v-app>
     <NavigationDrawer />
-
-    <v-main>
-      <NuxtPage />
-    </v-main>
   </v-app>
 </template>
 

@@ -1,7 +1,5 @@
 <template>
   <v-container>
-    <h1>Монеты</h1>
-
     <v-data-table
         :headers="headers"
         :items="coins"
@@ -69,7 +67,6 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import { useFetch } from '#app'
 
 const coins = ref([])
 const loading = ref(false)
@@ -86,8 +83,7 @@ const headers = [
 
 const fetchCoins = async () => {
   loading.value = true
-  const { data } = await useFetch('/api/getCoins')
-  coins.value = data.value
+  coins.value = await $fetch('/api/getCoins')
   loading.value = false
 }
 
@@ -101,7 +97,6 @@ const openAddDialog = () => {
   coinForm.value = { id: null, name: '' }
 
   nextTick(() => {
-    // Устанавливаем фокус на поле ввода
     if ($refs.coinInput) {
       $refs.coinInput.focus()
     }
@@ -131,7 +126,6 @@ const editCoin = (item) => {
   showAddDialog.value = true
 
   nextTick(() => {
-    // Устанавливаем фокус на поле ввода
     if ($refs.coinInput) {
       $refs.coinInput.focus()
     }
@@ -146,7 +140,7 @@ const confirmDeleteCoin = (item) => {
 const deleteCoinConfirmed = async () => {
   await $fetch('/api/deleteCoin', {
     method: 'delete',
-    body: {id: coinToDelete.value.id},
+    body: { id: coinToDelete.value.id },
   })
 
   showConfirmDeleteDialog.value = false
