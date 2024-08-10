@@ -8,17 +8,21 @@ export default defineEventHandler(async (event) => {
     try {
         const newCryptoData = await prisma.cryptoData.create({
             data: {
-                rate: parseFloat(body.rate),
-                executed: body.executed ? parseFloat(body.executed) : null,
-                low: parseFloat(body.low),
-                high: parseFloat(body.high),
-                coinId: body.coinId,  // ID монеты
-                statusId: body.statusId,  // ID статуса
+                rate: body.rate,
+                executed: body.executed,
+                low: body.low,
+                high: body.high,
+                comByCoin: body.comByCoin,
+                comSellUSDT: body.comSellUSDT,
+                active: body.active || 0, // Если active не передан, устанавливаем 0
                 purchaseDate: body.purchaseDate ? new Date(body.purchaseDate) : null,
                 saleDate: body.saleDate ? new Date(body.saleDate) : null,
                 orderDate: body.orderDate ? new Date(body.orderDate) : null,
+                coinId: body.coinId,
+                statusId: body.statusId,
             },
         });
+
 
         return {
             success: true,

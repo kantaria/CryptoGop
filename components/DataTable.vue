@@ -3,19 +3,32 @@
     <v-data-table
         :headers="headers"
         :items="items"
+        :search="searchQuery"
         class="elevation-1"
     >
-      <template v-slot:top>
-        <v-toolbar flat>
-          <v-toolbar-title>Crypto Data</v-toolbar-title>
-        </v-toolbar>
-      </template>
+    <template v-slot:top>
+      <v-toolbar flat>
+        <v-toolbar-title>Crypto Data</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-text-field
+            v-model="searchQuery"
+            append-icon="mdi-magnify"
+            label="Поиск"
+            single-line
+            hide-details
+        />
+      </v-toolbar>
+    </template>
     </v-data-table>
   </v-container>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useCryptoData } from '~/composables/useCryptoData'
+
+const { items, fetchCryptoData } = useCryptoData();
+const searchQuery = ref(''); // Переменная для хранения поискового запроса
 
 const headers = ref([
   { text: 'ID', value: 'id' },
@@ -23,39 +36,21 @@ const headers = ref([
   { text: 'Executed', value: 'executed' },
   { text: 'Low', value: 'low' },
   { text: 'High', value: 'high' },
-  { text: 'Status', value: 'status' },
-  { text: 'Coin', value: 'coin' },
+  { text: 'Status', value: 'status.name' }, // Корректный путь для вложенных объектов
+  { text: 'Coin', value: 'coin.name' }, // Корректный путь для вложенных объектов
   { text: 'Purchase Date', value: 'purchaseDate' },
   { text: 'Sale Date', value: 'saleDate' },
   { text: 'Order Date', value: 'orderDate' },
 ])
 
-const items = ref([
-  {
-    id: 1,
-    rate: 45000,
-    executed: 1.2,
-    low: 44000,
-    high: 46000,
-    status: 'completed',
-    coin: 'BTC',
-    purchaseDate: '2024-08-01',
-    saleDate: '2024-08-02',
-    orderDate: '2024-08-01',
-  },
-  {
-    id: 2,
-    rate: 3000,
-    executed: 10,
-    low: 2900,
-    high: 3100,
-    status: 'completed',
-    coin: 'ETH',
-    purchaseDate: '2024-08-03',
-    saleDate: '2024-08-04',
-    orderDate: '2024-08-03',
-  },
-])
+onMounted(() => {
+  fetchCryptoData(); // Загружаем данные при монтировании
+})
+
+// Опционально: наблюдаем за изменениями items, чтобы видеть обновления данных
+watch(items, (newItems) => {
+  console.log('Data updated:', newItems);
+})
 </script>
 
 <style scoped>

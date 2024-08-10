@@ -6,7 +6,7 @@
     <v-form @submit.prevent="saveCryptoData">
       <v-row>
         <!-- Поле для ставки -->
-        <v-col cols="12" md="4">
+        <v-col cols="12" md="2">
           <v-text-field
               v-model="cryptoData.rate"
               label="Ставка"
@@ -16,7 +16,7 @@
         </v-col>
 
         <!-- Поле для точки выхода -->
-        <v-col cols="12" md="4">
+        <v-col cols="12" md="2">
           <v-text-field
               v-model="cryptoData.executed"
               label="Точка выхода"
@@ -25,7 +25,7 @@
         </v-col>
 
         <!-- Поле Low -->
-        <v-col cols="12" md="4">
+        <v-col cols="12" md="2">
           <v-text-field
               v-model="cryptoData.low"
               label="Low"
@@ -35,7 +35,7 @@
         </v-col>
 
         <!-- Поле High -->
-        <v-col cols="12" md="4">
+        <v-col cols="12" md="2">
           <v-text-field
               v-model="cryptoData.high"
               label="High"
@@ -45,7 +45,7 @@
         </v-col>
 
         <!-- Выпадающий список Монета -->
-        <v-col cols="12" md="4">
+        <v-col cols="12" md="2">
           <v-select
               v-if="coins.length > 0"
               v-model="cryptoData.coin"
@@ -68,7 +68,7 @@
         </v-col>
 
         <!-- Выпадающий список Статус -->
-        <v-col cols="12" md="4">
+        <v-col cols="12" md="2">
           <v-select
               v-if="statuses.length > 0"
               v-model="cryptoData.status"
@@ -125,13 +125,17 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useCryptoData } from '~/composables/useCryptoData' // Импорт композиционной функции
 
-// Инициализация данных
+const { fetchCryptoData } = useCryptoData(); // Извлекаем функцию fetchCryptoData из композиции
+
 const cryptoData = ref({
   rate: '',
   executed: '',
   low: '',
   high: '',
+  comByCoin: '',
+  comSellUSDT: '',
   coin: null,
   status: null,
   purchaseDate: '',
@@ -173,16 +177,30 @@ const fetchStatuses = async () => {
 // Функция для сохранения данных
 const saveCryptoData = async () => {
   try {
+    const dataToSave = {
+      rate: parseFloat(cryptoData.value.rate),
+      executed: cryptoData.value.executed ? parseFloat(cryptoData.value.executed) : null,
+      low: parseFloat(cryptoData.value.low),
+      high: parseFloat(cryptoData.value.high),
+      comByCoin: parseFloat(cryptoData.value.comByCoin) || 0,
+      comSellUSDT: parseFloat(cryptoData.value.comSellUSDT) || 0,
+      coinId: cryptoData.value.coin?.id || null,
+      statusId: cryptoData.value.status?.id || null,
+      purchaseDate: cryptoData.value.purchaseDate ? new Date(cryptoData.value.purchaseDate) : null,
+      saleDate: cryptoData.value.saleDate ? new Date(cryptoData.value.saleDate) : null,
+      orderDate: cryptoData.value.orderDate ? new Date(cryptoData.value.orderDate) : null,
+    };
+
     await $fetch('/api/addCryptoData', {
       method: 'post',
-      body: {
-        ...cryptoData.value,
-        coinId: cryptoData.value.coin?.id || null,
-        statusId: cryptoData.value.status?.id || null
-      }
+      body: dataToSave
     });
+
+    await fetchCryptoData(); // Обновляем данные таблицы сразу после сохранения
+
     alert('Данные успешно сохранены!');
   } catch (error) {
+    console.error('Ошибка при сохранении данных:', error);
     alert('Ошибка при сохранении данных');
   }
 };
@@ -191,5 +209,7 @@ const saveCryptoData = async () => {
 onMounted(() => {
   fetchCoins();
   fetchStatuses();
+  fetchCryptoData(); // Загрузка данных для таблицы при монтировании
 });
 </script>
+
