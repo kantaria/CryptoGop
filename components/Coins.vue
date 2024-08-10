@@ -83,9 +83,16 @@ const headers = [
 
 const fetchCoins = async () => {
   loading.value = true
-  coins.value = await $fetch('/api/getCoins')
-  loading.value = false
+  try {
+    coins.value = await $fetch('/api/getCoins')
+  } catch (error) {
+    console.error('Ошибка при загрузке монет:', error)
+    coins.value = [] // Защита от некорректных данных
+  } finally {
+    loading.value = false
+  }
 }
+
 
 onMounted(() => {
   fetchCoins()

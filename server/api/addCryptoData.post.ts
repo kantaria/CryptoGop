@@ -5,22 +5,30 @@ const prisma = new PrismaClient();
 export default defineEventHandler(async (event) => {
     const body = await readBody(event);
 
-    const newCryptoData = await prisma.cryptoData.create({
-        data: {
-            rate: body.rate,
-            executed: body.executed,
-            low: body.low,
-            high: body.high,
-            comByCoin: body.comByCoin,
-            comSellUSDT: body.comSellUSDT,
-            active: body.active,
-            status: body.status,
-            purchaseDate: new Date(body.purchaseDate),
-            saleDate: body.saleDate ? new Date(body.saleDate) : null,
-            orderDate: new Date(body.orderDate),
-            coinId: body.coinId,  // Используем ID существующей монеты
-        },
-    });
+    try {
+        const newCryptoData = await prisma.cryptoData.create({
+            data: {
+                rate: parseFloat(body.rate),
+                executed: body.executed ? parseFloat(body.executed) : null,
+                low: parseFloat(body.low),
+                high: parseFloat(body.high),
+                coinId: body.coinId,  // ID монеты
+                statusId: body.statusId,  // ID статуса
+                purchaseDate: body.purchaseDate ? new Date(body.purchaseDate) : null,
+                saleDate: body.saleDate ? new Date(body.saleDate) : null,
+                orderDate: body.orderDate ? new Date(body.orderDate) : null,
+            },
+        });
 
-    return newCryptoData;
+        return {
+            success: true,
+            data: newCryptoData,
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: 'Ошибка при добавлении данных.',
+            error: error.message,
+        };
+    }
 });
