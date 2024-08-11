@@ -22,21 +22,20 @@ model Status {
 }
 
 model CryptoData {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   rate         Float
-  executed     Float
+  executed     Float?
+  commission   Float
   low          Float
   high         Float
-  comByCoin    Float
-  comSellUSDT  Float
   active       Float
-  purchaseDate DateTime
-  saleDate     DateTime
-  orderDate    DateTime
+  purchaseDate DateTime?
+  saleDate     DateTime?
+  orderDate    DateTime?
 
   coinId Int
   coin   Coin @relation(fields: [coinId], references: [id])
 
   statusId Int
-  Status   Status @relation(fields: [statusId], references: [id])
+  status   Status @relation(fields: [statusId], references: [id])
 }

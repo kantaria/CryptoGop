@@ -12,6 +12,7 @@
               label="Ставка"
               :rules="[rules.required, rules.number]"
               required
+              value="100,0194836"
           />
         </v-col>
 
@@ -31,6 +32,7 @@
               label="Low"
               :rules="[rules.required, rules.number]"
               required
+              value="2651,63"
           />
         </v-col>
 
@@ -41,6 +43,7 @@
               label="High"
               :rules="[rules.required, rules.number]"
               required
+              value="2700"
           />
         </v-col>
 
@@ -114,6 +117,7 @@
               v-model="cryptoData.orderDate"
               label="Дата ордера"
               :rules="[rules.date]"
+              value="11.08.2024 12:41:17"
           />
         </v-col>
       </v-row>
@@ -134,8 +138,7 @@ const cryptoData = ref({
   executed: '',
   low: '',
   high: '',
-  comByCoin: '',
-  comSellUSDT: '',
+  commission: '', // Теперь это поле не используется напрямую
   coin: null,
   status: null,
   purchaseDate: '',
@@ -149,7 +152,7 @@ const statuses = ref([]);
 // Правила валидации
 const rules = {
   required: value => !!value || 'Обязательно для заполнения.',
-  number: value => !isNaN(parseFloat(value)) || 'Только цифры.',
+  number: value => !isNaN(parseFloat(value.replace(',', '.'))) || 'Только цифры.',
   date: value => /^\d{4}-\д{2}-\д{2}$/.test(value) || 'Неверный формат даты. Используйте ГГГ-ММ-ДД.'
 }
 
@@ -177,13 +180,15 @@ const fetchStatuses = async () => {
 // Функция для сохранения данных
 const saveCryptoData = async () => {
   try {
+    const rate = parseFloat(cryptoData.value.rate.replace(',', '.')); // Преобразование строки с запятой в число с точкой
+    const commission = rate * 0.001; // 0,1% от rate
+
     const dataToSave = {
-      rate: parseFloat(cryptoData.value.rate),
-      executed: cryptoData.value.executed ? parseFloat(cryptoData.value.executed) : null,
-      low: parseFloat(cryptoData.value.low),
-      high: parseFloat(cryptoData.value.high),
-      comByCoin: parseFloat(cryptoData.value.comByCoin) || 0,
-      comSellUSDT: parseFloat(cryptoData.value.comSellUSDT) || 0,
+      rate,
+      executed: cryptoData.value.executed ? parseFloat(cryptoData.value.executed.replace(',', '.')) : null,
+      low: parseFloat(cryptoData.value.low.replace(',', '.')),
+      high: parseFloat(cryptoData.value.high.replace(',', '.')),
+      commission: commission,
       coinId: cryptoData.value.coin?.id || null,
       statusId: cryptoData.value.status?.id || null,
       purchaseDate: cryptoData.value.purchaseDate ? new Date(cryptoData.value.purchaseDate) : null,
@@ -191,6 +196,7 @@ const saveCryptoData = async () => {
       orderDate: cryptoData.value.orderDate ? new Date(cryptoData.value.orderDate) : null,
     };
 
+    console.log(dataToSave);
     await $fetch('/api/addCryptoData', {
       method: 'post',
       body: dataToSave
@@ -198,12 +204,12 @@ const saveCryptoData = async () => {
 
     await fetchCryptoData(); // Обновляем данные таблицы сразу после сохранения
 
-    alert('Данные успешно сохранены!');
+    console.log('Данные успешно сохранены!');
   } catch (error) {
     console.error('Ошибка при сохранении данных:', error);
-    alert('Ошибка при сохранении данных');
   }
 };
+
 
 // Загрузка данных при монтировании компонента
 onMounted(() => {
@@ -212,4 +218,3 @@ onMounted(() => {
   fetchCryptoData(); // Загрузка данных для таблицы при монтировании
 });
 </script>
-

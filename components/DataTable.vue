@@ -36,12 +36,14 @@ const headers = ref([
   { text: 'Executed', value: 'executed' },
   { text: 'Low', value: 'low' },
   { text: 'High', value: 'high' },
-  { text: 'Status', value: 'status.name' }, // Корректный путь для вложенных объектов
-  { text: 'Coin', value: 'coin.name' }, // Корректный путь для вложенных объектов
+  { text: 'Commission', value: 'commission' }, // Новое поле
+  { text: 'Status', value: 'status.name' },
+  { text: 'Coin', value: 'coin.name' },
   { text: 'Purchase Date', value: 'purchaseDate' },
   { text: 'Sale Date', value: 'saleDate' },
   { text: 'Order Date', value: 'orderDate' },
-])
+]);
+
 
 onMounted(() => {
   fetchCryptoData(); // Загружаем данные при монтировании
